@@ -21,6 +21,7 @@ module Vanity
         setup_connection(options)
         @options = options.clone
         @options[:database] ||= (@options[:path] && @options[:path].split("/")[1]) || "vanity"
+        options_from_uri
         connect!
       end
 
@@ -76,6 +77,11 @@ module Vanity
         @participants.drop
       end
 
+      def options_from_uri(options)
+        if @options[:uri]
+          @options[:username], @options[:password], @options[:database] = @options[:uri].scan(/mongodb:\/\/(.*):(.*)@.*\/(.*)/)
+        end
+      end
 
       # -- Metrics --
 
