@@ -25,13 +25,15 @@ module Vanity
       end
 
       def setup_connection(options = {})
-        if options[:hosts]
+        @mongo = case
+        when options[:hosts]
           args = (options[:hosts].map{|host| [host, options[:port]] } << {:connect => false})
-          @mongo = Mongo::ReplSetConnection.new(*args)
+          Mongo::ReplSetConnection.new(*args)
+        when options[:uri]
+          Mongo::Connection.from_uri(options[:uri])
         else
-          @mongo = Mongo::Connection.new(options[:host], options[:port], :connect => false)
+          Mongo::Connection.new(options[:host], options[:port], :connect => false)
         end
-        @mongo
       end
 
       def active?
@@ -73,10 +75,10 @@ module Vanity
         @experiments.drop
         @participants.drop
       end
-      
+
 
       # -- Metrics --
-      
+
       def get_metric_last_update_at(metric)
         record = @metrics.find_one(:_id=>metric)
         record && record["last_update_at"]
@@ -99,10 +101,10 @@ module Vanity
       def destroy_metric(metric)
         @metrics.remove :_id=>metric
       end
-      
+
 
       # -- Experiments --
-     
+
       def set_experiment_created_at(experiment, time)
         @experiments.insert :_id=>experiment, :created_at=>time
       end
