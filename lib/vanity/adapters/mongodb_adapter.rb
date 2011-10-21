@@ -77,7 +77,7 @@ module Vanity
         @participants.drop
       end
 
-      def options_from_uri(options)
+      def options_from_uri
         if @options[:uri]
           @options[:username], @options[:password], @options[:database] = @options[:uri].scan(/mongodb:\/\/(.*):(.*)@.*\/(.*)/)
         end
